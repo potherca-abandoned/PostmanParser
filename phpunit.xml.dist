@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit
+		backupGlobals="false"
+		backupStaticAttributes="false"
+		bootstrap="./tests/bootstrap.php"
+		cacheTokens="true"
+		colors="true"
+		convertErrorsToExceptions="true"
+		convertNoticesToExceptions="true"
+		convertWarningsToExceptions="true"
+		forceCoversAnnotation="false"
+		mapTestClassNameToCoveredClassName="true"
+		processIsolation="false"
+		stopOnError="false"
+		stopOnFailure="false"
+		stopOnIncomplete="false"
+		stopOnSkipped="false"
+		strict="true"
+		verbose="true"
+>
+	<testsuites>
+		<testsuite name="PostmanParser">
+			<directory suffix=".php">./tests/</directory>
+		</testsuite>
+	</testsuites>
+	
+	<logging>
+    <!--
+            <log type="coverage-html" target="./test-report"  title="PostmanParser"
+                 charset="UTF8" yui="true" highlight="true" showUncoveredFiles="true"
+                 lowUpperBound="35" highLowerBound="70"/>
+    -->
+            <log type="coverage-clover" target="tests/coverage.xml"/>
+        </logging>
+</phpunit>

@@ -1,0 +1,22 @@
+{
+    "name": "Potherca/PostmanParser",
+    "version": "0.0.0-alpha",
+    "homepage" : "http://Pother.ca/PostmanParser",
+    "license": "GPL-3.0+",
+    "authors": [
+        {
+            "name": "Potherca",
+            "email": "potherca@gmail.com",
+            "homepage": "http://pother.ca/",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+    },
+    "require-dev" : {
+        "phpunit/phpunit": "4.0.*"
+    },
+    "autoload": {
+        "psr-4": {"Potherca\\": "src/"}
+    }
+}
