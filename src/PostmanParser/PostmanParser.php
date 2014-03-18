@@ -48,8 +48,8 @@ class PostmanParser
 
         foreach ($oFile as $t_sLine) {
             $sContent .= $t_sLine;
-            var_dump($sContent);
         }
+
         return $this->parse($sContent);
     }
 
@@ -91,5 +91,3 @@ class PostmanParser
         ;
     }
 }
-
-//EOF

@@ -113,6 +113,7 @@ class PostmanParserTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      *
+     * @covers ::parse
      * @covers ::collectionFromFile
      *
      * @depends parse_ReturnsCollection_WhenGivenValidPostmanJson
@@ -149,11 +150,17 @@ class PostmanParserTest extends \PHPUnit_Framework_TestCase
 
         $iLength = count($aFileContent);
 
-        $fileObject->expects($this->exactly($iLength))
+        $fileObject->expects($this->exactly($iLength + 1))
             ->method('valid')
             ->will($this->returnCallback(
-                function() use ($aFileContent){
-                    return array_pop($aFileContent);
+                function() use ($aFileContent, $iLength){
+                    static $iCounter;
+
+                    if($iCounter === null){
+                        $iCounter = $iLength;
+                    }
+
+                    return ($iCounter--) > 0;
                 })
             )
         ;
@@ -162,7 +169,13 @@ class PostmanParserTest extends \PHPUnit_Framework_TestCase
             ->method('current')
             ->will($this->returnCallback(
                 function() use ($aFileContent, $iLength){
-                    return count($aFileContent) < $iLength;
+                    static $iCounter;
+
+                    if($iCounter === null){
+                        $iCounter = $iLength;
+                    }
+
+                    return $aFileContent[$iLength - $iCounter--];
                 })
             )
         ;
