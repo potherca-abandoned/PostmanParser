@@ -2,8 +2,9 @@
 
 namespace Potherca\PostmanParser;
 
-interface PostmanCollection
+interface PostmanItemCollection extends PostmanItem
 {
+    const ATTRIBUTE_ORDER = 'order';
     /**
      * @return \string[]
      */

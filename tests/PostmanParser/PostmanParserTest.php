@@ -11,6 +11,19 @@ namespace Potherca\PostmanParser;
 class PostmanParserTest extends \PHPUnit_Framework_TestCase
 {
 //////////////////////////////////// FIXTURES \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+    protected $m_aValidJson = array(
+        'id' => 'foo-bar-baz-id-123',
+        'name' => 'Example Postman Collection',
+        'description' => 'Description of Example Postman Collection',
+        'order' =>
+            array(),
+        'folders' =>
+            array(),
+        'timestamp' => 1234567890123,
+        'synced' => false,
+        'requests' =>
+            array(),
+    );
     /** @var PostmanParser */
     protected $parser = null;
 
@@ -23,77 +36,165 @@ class PostmanParserTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      *
-     * @covers ::parse
+     * @covers ::fillCollectionFromString
      *
      * @expectedException \PHPUnit_Framework_Error_Warning
      * @expectedExceptionMessage Missing argument 1
      */
-    public function parse_TriggersError_WhenNotGivenJsonParameter()
+    public function fillCollectionFromString_TriggersError_WhenNotGivenJsonParameter()
     {
         $parser = $this->parser;
         /** @noinspection PhpParamsInspection */
-        $parser->parse();
+        $parser->fillCollectionFromString();
     }
 
     /**
      * @test
      *
-     * @covers ::parse
+     * @covers ::fillCollectionFromString
      *
      * @expectedException \InvalidArgumentException
      * @expectedExceptionMessage \Potherca\PostmanParser\PostmanParser::ERROR_JSON_DOES_NOT_REPRESENT_POSTMAN_COLLECTION
      */
-    public function parse_ThrowsException_WhenGivenJsonParameterNotString()
+    public function fillCollectionFromString_ThrowsException_WhenGivenJsonParameterNotString()
     {
+        $mockCollection = $this->getMockCollection();
+
         $parser = $this->parser;
-        $parser->parse(array());
+
+        $parser->fillCollectionFromString(array(), $mockCollection);
     }
 
     /**
      * @test
      *
-     * @covers ::parse
+     * @covers ::fillCollectionFromString
      *
      * @expectedException \InvalidArgumentException
      * @expectedExceptionMessage \Potherca\PostmanParser\PostmanParser::ERROR_JSON_DOES_NOT_REPRESENT_POSTMAN_COLLECTION
      */
-    public function parse_ThrowsException_WhenGivenJsonParameterNotValidJson()
+    public function fillCollectionFromString_ThrowsException_WhenGivenJsonParameterNotValidJson()
     {
         $parser = $this->parser;
+
+        $mockCollection = $this->getMockCollection();
+
         $json = '<div>Not Valid Json</div>';
-        $parser->parse($json);
+
+        $parser->fillCollectionFromString($json, $mockCollection);
     }
 
     /**
      * @test
      *
-     * @covers ::parse
+     * @covers ::fillCollectionFromString
      *
      * @expectedException \InvalidArgumentException
      * @expectedExceptionMessage \Potherca\PostmanParser\PostmanParser::ERROR_JSON_DOES_NOT_REPRESENT_POSTMAN_COLLECTION
      */
-    public function parse_ThrowsException_WhenGivenJsonNotPostmanCompatible()
+    public function fillCollectionFromString_ThrowsException_WhenGivenJsonNotPostmanCompatible()
     {
         $parser = $this->parser;
+
+        $mockCollection = $this->getMockCollection();
+
         $json = '{}';
-        $parser->parse($json);
+
+        $parser->fillCollectionFromString($json, $mockCollection);
     }
 
     /**
      * @test
      *
-     * @covers ::parse
+     * @covers ::fillCollectionFromString
      *
-     * @dataProvider dataProvider_validJson
+     * @expectedException \PHPUnit_Framework_Error
+     * @expectedExceptionMessage must be an instance of Potherca\PostmanParser\Collection
      */
-    public function parse_ReturnsCollection_WhenGivenValidPostmanJson($json)
+    public function fillCollectionFromString_TriggersError_WhenNotGivenCollectionParameter()
+    {
+        $parser = $this->parser;
+        /** @noinspection PhpParamsInspection */
+        $parser->fillCollectionFromString('');
+    }
+
+    /**
+     * @test
+     *
+     * @covers ::fillCollectionFromString
+     *
+     * @expectedException \PHPUnit_Framework_Error
+     * @expectedExceptionMessage must be an instance of Potherca\PostmanParser\Collection
+     */
+    public function fillCollectionFromString_ThrowsException_WhenGivenCollectionParameterNotCollection()
+    {
+        $parser = $this->parser;
+        /** @noinspection PhpParamsInspection */
+        $parser->fillCollectionFromString(''. 'foo');
+    }
+
+    /**
+     * @test
+     *
+     * @covers ::fillCollectionFromString
+     */
+    public function fillCollectionFromString_ReturnsGivenCollection_WhenGivenValidPostmanJsonAndCollection()
     {
         $parser = $this->parser;
 
-        $collection = $parser->parse($json);
+        $json = $this->getValidJson();
 
-        $this->assertInstanceOf('Potherca\PostmanParser\Collection', $collection);
+        $mockCollection = $this->getMockCollection();
+
+        $collection = $parser->fillCollectionFromString($json, $mockCollection);
+
+        $this->assertSame($mockCollection, $collection);
     }
+
+    /**
+     * @test
+     *
+     * @covers ::fillCollectionFromString
+     */
+    public function fillCollectionFromString_ReturnedCollectionHasAttributesFromPostmanJson_WhenGivenValidPostmanJson()
+    {
+        $parser = $this->parser;
+
+        $json = $this->getValidJson();
+        $jsonArray = $this->m_aValidJson;
+
+        $mockCollection = $this->getMockCollection();
+
+        $mockCollection->expects($this->exactly(1))
+            -> method('setId')
+            -> with($jsonArray[PostmanItem::ATTRIBUTE_ID])
+        ;
+
+        $mockCollection->expects($this->exactly(1))
+            -> method('setName')
+            -> with($jsonArray[PostmanItem::ATTRIBUTE_NAME])
+        ;
+
+        $mockCollection->expects($this->exactly(1))
+            -> method('setDescription')
+            -> with($jsonArray[PostmanItem::ATTRIBUTE_DESCRIPTION])
+        ;
+
+        $mockCollection->expects($this->exactly(1))
+            -> method('setOrder')
+            -> with($jsonArray[Collection::ATTRIBUTE_ORDER])
+        ;
+
+        $mockCollection->expects($this->exactly(1))
+            -> method('setFolders')
+            -> with($jsonArray[Collection::ATTRIBUTE_FOLDERS])
+        ;
+
+        $this->fail('HIER GEBLEVEN');
+
+        $parser->fillCollectionFromString($json, $mockCollection);
+    }
+
 
     /**
      * @test
@@ -103,35 +204,55 @@ class PostmanParserTest extends \PHPUnit_Framework_TestCase
      * @expectedException \PHPUnit_Framework_Error
      * @expectedExceptionMessage must be an instance of SplFileObject
      */
-    public function collectionFromFile_TriggersError_WhenNotGivenFile()
+    public function fillCollectionFromFile_TriggersError_WhenNotGivenFile()
     {
         $parser = $this->parser;
         /** @noinspection PhpParamsInspection */
-        $parser->collectionFromFile();
+        $parser->fillCollectionFromFile();
     }
 
     /**
      * @test
      *
-     * @covers ::parse
-     * @covers ::collectionFromFile
+     * @covers ::fillCollectionFromString
+     * @covers ::fillCollectionFromFile
+     * @covers \PHPUnit_Framework_MockObject_Generator::evalClass
      *
-     * @depends parse_ReturnsCollection_WhenGivenValidPostmanJson
-     *
-     * @dataProvider dataProvider_validJson
+     * @depends fillCollectionFromString_ReturnsCollection_WhenGivenValidPostmanJson
      */
-    public function collectionFromFile_ReturnCollection_WhenGivenFileContainsValidJson($json)
+    public function fillCollectionFromFile_ReturnCollection_WhenGivenFileContainsValidJson()
     {
         $parser = $this->parser;
 
-        $file = $this->getMockSplFileObject($json);
+        $json = $this->getValidJson();
 
-        $collection = $parser->collectionFromFile($file);
+        $mockFile = $this->getMockSplFileObject($json);
+        $mockCollection = $this->getMockCollection();
+
+        $collection = $parser->fillCollectionFromFile($mockFile, $mockCollection);
 
         $this->assertInstanceOf('\Potherca\PostmanParser\Collection', $collection);
     }
 
 //////////////////////////////// MOCKS AND STUBS \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+    /**
+     * @return \PHPUnit_Framework_MockObject_MockObject|Collection
+     */
+    protected function getMockCollection()
+    {
+        $mockCollection = $this->getMockBuilder('Potherca\PostmanParser\Collection')
+            ->setMethods(
+                array(
+                    'setId', 'setName', 'setDescription', 'setOrder',
+                    'setFolders', 'setRequests', 'setSynced', 'setTimestamp'
+                )
+            )
+            ->getMock()
+        ;
+
+        return $mockCollection;
+    }
+
     /**
      * @param string $p_sFileContents
      *
@@ -187,20 +308,9 @@ class PostmanParserTest extends \PHPUnit_Framework_TestCase
     /**
      * @return string
      */
-    public function dataProvider_validJson()
+    public function getValidJson()
     {
-        $json = '{
-            "id": "foo-bar-baz-id-123",
-            "name": "Example Postman Collection",
-            "description": "Description of Example Postman Collection",
-            "order": [],
-            "folders": [],
-            "timestamp": 1234567890123,
-            "synced": false,
-            "requests": []
-        }';
-
-        return array(array($json));
+        return json_encode($this->m_aValidJson);
     }
 }
 

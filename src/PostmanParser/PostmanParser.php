@@ -5,6 +5,7 @@ namespace Potherca\PostmanParser;
 class PostmanParser
 {
     const ERROR_JSON_DOES_NOT_REPRESENT_POSTMAN_COLLECTION = 'Given Json does not represent a valid Postman JSON Collection';
+
     /** @var string */
     protected $originalJson;
 //////////////////////////////// CLASS PROPERTIES \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
@@ -27,22 +28,54 @@ class PostmanParser
 
 ////////////////////////////////// PUBLIC API \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 
-    public function parse($p_sPostmanJson)
+    /**
+     * Populate given collection with given JSON string.
+     *
+     * If given string is not valid Postman JSON an InvalidArgumentException
+     * will be thrown.
+     *
+     * @param $p_sPostmanJson
+     * @param \Potherca\PostmanParser\Collection $p_oCollection
+     *
+     * @throws \InvalidArgumentException
+     * @return PostmanItemCollection
+     */
+    public function fillCollectionFromString($p_sPostmanJson, Collection $p_oCollection)
     {
-        if($this->isValid($p_sPostmanJson) === false){
+        $aJson = $this->parseJson($p_sPostmanJson);
+
+        if (is_array($aJson) === false) {
             throw new \InvalidArgumentException(self::ERROR_JSON_DOES_NOT_REPRESENT_POSTMAN_COLLECTION);
         } else {
-            $oCollection = new Collection();
-            return $oCollection;
+            $p_oCollection->setId($aJson[PostmanItemCollection::ATTRIBUTE_ID]);
+            $p_oCollection->setName($aJson[PostmanItemCollection::ATTRIBUTE_NAME]);
+            $p_oCollection->setDescription($aJson[PostmanItemCollection::ATTRIBUTE_DESCRIPTION]);
+            
+            $p_oCollection->setOrder($aJson[PostmanItemCollection::ATTRIBUTE_ORDER]);
+
+//            $p_oCollection->setFolders($aJson[Collection::ATTRIBUTE_FOLDERS]);
+            $p_oCollection->setRequests($aJson[Collection::ATTRIBUTE_REQUESTS]);
+//            $p_oCollection->setSynced($aJson[Collection::ATTRIBUTE_SYNCED]);
+//            $p_oCollection->setTimestamp($aJson[Collection::ATTRIBUTE_TIMESTAMP]);
+
+            return $p_oCollection;
         }
     }
 
     /**
+     * Populate given collection with content from given File.
+     *
+     * If given file is not a valid Postman file an InvalidArgumentException
+     * will be thrown.
+     *
      * @param \SplFileObject $oFile
+     * @param PostmanItemCollection $p_oCollection
+     *
+     * @throws \InvalidArgumentException
      *
      * @return Collection
      */
-    public function collectionFromFile(\SplFileObject $oFile)
+    public function fillCollectionFromFile(\SplFileObject $oFile, PostmanItemCollection $p_oCollection)
     {
         $sContent = '';
 
@@ -50,44 +83,50 @@ class PostmanParser
             $sContent .= $t_sLine;
         }
 
-        return $this->parse($sContent);
+        return $this->fillCollectionFromString($sContent, $p_oCollection);
     }
 
 //////////////////////////////// UTILITY METHODS \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
     /**
+     * Parses given JSON string
+     *
+     * Return Array representation of given JSON string if given string is
+     * valid Postman JSON collection, null otherwise.
+     *
      * @param string $p_sPostmanJson
      *
-     * @return bool
+     * @return null|array
      */
-    protected function isValid($p_sPostmanJson)
+    protected function parseJson($p_sPostmanJson)
     {
-        $bIsValid = false;
+        $aJson = null;
 
         if(is_string($p_sPostmanJson)){
             $aPostmanContents = json_decode($p_sPostmanJson, true);
-            if (is_array($aPostmanContents)) {
-                $bIsValid = $this->isPostmanArray($aPostmanContents);
+            if ($this->isPostmanArray($aPostmanContents)) {
+                $aJson = $aPostmanContents;
             }
         }
 
-        return $bIsValid;
+        return $aJson;
     }
 
     /**
-     * @param array $p_aPostman
+     * @param mixed $p_aPostman
      *
      * @return bool
      */
-    protected function isPostmanArray(array $p_aPostman)
+    protected function isPostmanArray($p_aPostman)
     {
-        return isset($p_aPostman['id'], $p_aPostman['name'], $p_aPostman['description'],
-            $p_aPostman['order'], $p_aPostman['folders'], $p_aPostman['timestamp'],
-            $p_aPostman['synced'], $p_aPostman['requests']) &&
-            is_array($p_aPostman['order']) &&
-            is_array($p_aPostman['folders']) &&
-            is_array($p_aPostman['requests']) &&
-            (is_integer($p_aPostman['timestamp']) || is_float($p_aPostman['timestamp']))&&
-            is_bool($p_aPostman['synced'])
+        return  is_array($p_aPostman) &&
+            isset($p_aPostman[PostmanItemCollection::ATTRIBUTE_ID], $p_aPostman[PostmanItemCollection::ATTRIBUTE_NAME], $p_aPostman[PostmanItemCollection::ATTRIBUTE_DESCRIPTION],
+            $p_aPostman[PostmanItemCollection::ATTRIBUTE_ORDER], $p_aPostman[Collection::ATTRIBUTE_FOLDERS], $p_aPostman[Collection::ATTRIBUTE_TIMESTAMP],
+            $p_aPostman[Collection::ATTRIBUTE_SYNCED], $p_aPostman[Collection::ATTRIBUTE_REQUESTS]) &&
+            is_array($p_aPostman[PostmanItemCollection::ATTRIBUTE_ORDER]) &&
+            is_array($p_aPostman[Collection::ATTRIBUTE_FOLDERS]) &&
+            is_array($p_aPostman[Collection::ATTRIBUTE_REQUESTS]) &&
+            (is_integer($p_aPostman[Collection::ATTRIBUTE_TIMESTAMP]) || is_float($p_aPostman[Collection::ATTRIBUTE_TIMESTAMP]))&&
+            is_bool($p_aPostman[Collection::ATTRIBUTE_SYNCED])
         ;
     }
 }

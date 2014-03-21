@@ -4,6 +4,10 @@ namespace Potherca\PostmanParser;
 
 interface PostmanItem
 {
+    const ATTRIBUTE_ID = 'id';
+    const ATTRIBUTE_NAME = 'name';
+    const ATTRIBUTE_DESCRIPTION = 'description';
+
     /**
      * @param string $description
      */
