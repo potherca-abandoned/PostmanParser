@@ -190,9 +190,9 @@ class PostmanParserTest extends \PHPUnit_Framework_TestCase
             -> with($jsonArray[Collection::ATTRIBUTE_FOLDERS])
         ;
 
-        $this->fail('HIER GEBLEVEN');
+        //$parser->fillCollectionFromString($json, $mockCollection);
 
-        $parser->fillCollectionFromString($json, $mockCollection);
+        $this->markTestIncomplete('YOU ARE HERE:' . __FILE__ . ':' . __LINE__);
     }
 
 

@@ -42,16 +42,32 @@ class Collection extends Item implements PostmanItemCollection
     }
 
     /**
-     * @return \Potherca\PostmanParser\Request[]
+     * @param Request[] $p_oFolders
+     *
+     * @throws \InvalidArgumentException
      */
-    public function getRequests()
+    public function setFolders(array $p_oFolders)
     {
-        $this->requests;
+        foreach ($p_oFolders as $t_sId => $t_oFolder) {
+            if ($t_oFolder instanceof Folder === false) {
+                throw new \InvalidArgumentException('Given array does not contain only Folder objects');
+            } else {
+                $this->folders[$t_sId] = $t_oFolder;
+            }
+        }
     }
 
     /**
-     * @param array $p_oRequests
-s     *
+     * @return \Potherca\PostmanParser\Folder[]
+     */
+    public function getFolders()
+    {
+        return $this->folders;
+    }
+
+    /**
+     * @param Request[] $p_oRequests
+     *
      * @throws \InvalidArgumentException
      */
     public function setRequests(array $p_oRequests)
@@ -63,6 +79,14 @@ s     *
                 $this->requests[$t_sId] = $t_oRequest;
             }
         }
+    }
+
+    /**
+     * @return \Potherca\PostmanParser\Request[]
+     */
+    public function getRequests()
+    {
+        $this->requests;
     }
 
     /**
