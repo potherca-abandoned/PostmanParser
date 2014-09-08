@@ -2,23 +2,23 @@ box: wercker/php
 build:
     # The steps that will be executed on build
     steps:
-      - script:
-          name: echo php information
-          code: |-
-            echo "================================================================================"
-            echo "PHP version  : $(php --version)"
-            echo "Running from : $(which php)"
-            echo "Installed Modules: $(php --modules)"
-            echo "================================================================================"
-    # Install dependencies with composer
-    - script:
-        name: Install Dependencies
-        code: |-
-            composer install --dev --no-interaction
-    # Execute tests with PhpUnit
-    - script:
-        name: Run Test Suite
-        code: |-
-            php ./vendor/bin/phpunit
+        - script:
+            name: echo php information
+            code: |-
+                echo "================================================================================"
+                echo "PHP version  : $(php --version)"
+                echo "Running from : $(which php)"
+                echo "Installed Modules: $(php --modules)"
+                echo "================================================================================"
+            # Install dependencies with composer
+        - script:
+            name: Install Dependencies
+            code: |-
+                composer install --dev --no-interaction
+        # Execute tests with PhpUnit
+        - script:
+            name: Run Test Suite
+            code: |-
+                php ./vendor/bin/phpunit
 
 #EOF
