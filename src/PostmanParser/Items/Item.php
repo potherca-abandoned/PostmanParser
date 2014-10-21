@@ -1,6 +1,8 @@
 <?php
 
-namespace Potherca\PostmanParser;
+namespace Potherca\PostmanParser\Items;
+
+use Potherca\PostmanParser\PostmanItem;
 
 abstract class Item implements PostmanItem
 {
@@ -10,15 +12,15 @@ abstract class Item implements PostmanItem
     /** @var string */
     protected $m_sName;
     /** @var string */
-    protected $description;
+    protected $m_sDescription;
 
 ////////////////////////////// SETTERS AND GETTERS \\\\\\\\\\\\\\\\\\\\\\\\\\\\\
     /**
-     * @param string $id
+     * @param string $p_sId
      */
-    public function setId($id)
+    public function setId($p_sId)
     {
-        $this->m_sId = $id;
+        $this->m_sId = $p_sId;
     }
 
     /**
@@ -30,11 +32,11 @@ abstract class Item implements PostmanItem
     }
 
     /**
-     * @param string $name
+     * @param string $p_sName
      */
-    public function setName($name)
+    public function setName($p_sName)
     {
-        $this->m_sName = $name;
+        $this->m_sName = $p_sName;
     }
 
     /**
@@ -46,11 +48,11 @@ abstract class Item implements PostmanItem
     }
 
     /**
-     * @param string $description
+     * @param string $p_sDescription
      */
-    public function setDescription($description)
+    public function setDescription($p_sDescription)
     {
-        $this->description = $description;
+        $this->m_sDescription = $p_sDescription;
     }
 
     /**
@@ -58,6 +60,6 @@ abstract class Item implements PostmanItem
      */
     public function getDescription()
     {
-        return $this->description;
+        return $this->m_sDescription;
     }
 }
