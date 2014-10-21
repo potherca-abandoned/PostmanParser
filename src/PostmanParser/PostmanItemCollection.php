@@ -5,6 +5,7 @@ namespace Potherca\PostmanParser;
 interface PostmanItemCollection extends PostmanItem
 {
     const ATTRIBUTE_ORDER = 'order';
+
     /**
      * @return \string[]
      */
@@ -13,5 +14,5 @@ interface PostmanItemCollection extends PostmanItem
     /**
      * @param \string[] $order
      */
-    public function setOrder($order);
+    public function setOrder(array $order);
 }
