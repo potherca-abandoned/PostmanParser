@@ -3,7 +3,7 @@ build:
     # The steps that will be executed on build
     steps:
         - script:
-            name: echo php information
+            name: PHP Information
             code: |-
                 echo "================================================================================"
                 echo "PHP version  : $(php --version)"
