@@ -19,6 +19,6 @@ build:
         - script:
             name: Run Test Suite
             code: |-
-                php ./vendor/bin/phpunit
+                ./vendor/bin/phpunit
 
 #EOF
